@@ -21,9 +21,11 @@ import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 
 public class PaymentFeignConfig {
 
@@ -34,16 +36,16 @@ public class PaymentFeignConfig {
 
     @Bean
     public Encoder feignEncoder() {
-        MappingJackson2HttpMessageConverter jackson2HttpMessageConverter
+        HttpMessageConverter<Object> jacksonConverter
                 = new MappingJackson2HttpMessageConverter(app03ObjectMapper());
         ObjectFactory<HttpMessageConverters> objectFactory
-                = () -> new HttpMessageConverters(jackson2HttpMessageConverter);
+                = () -> new HttpMessageConverters(jacksonConverter);
         return new SpringEncoder(objectFactory);
     }
 
     @Bean
     public Decoder feignDecoder() {
-        MappingJackson2HttpMessageConverter jackson2HttpMessageConverter
+        HttpMessageConverter<Object> jackson2HttpMessageConverter
                 = new MappingJackson2HttpMessageConverter(app03ObjectMapper());
         ObjectFactory<HttpMessageConverters> objectFactory
                 = () -> new HttpMessageConverters(jackson2HttpMessageConverter);
@@ -66,6 +68,11 @@ public class PaymentFeignConfig {
             @Override
             public HttpMessageConverterCustomizer getObject() throws BeansException {
                 return null;
+            }
+
+            @Override
+            public void forEach(Consumer action) {
+                // do nothing
             }
         }));
     }
